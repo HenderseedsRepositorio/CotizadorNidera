@@ -6,6 +6,7 @@
 <title>Henderseeds — Cotizador Nidera</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 /* ══════ RESET & VARIABLES ══════ */
 *,*::before,*::after{box-sizing:border-box}
@@ -121,6 +122,30 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 .cond-table td:nth-child(2),.cond-table td:nth-child(3),.cond-table td:nth-child(4){text-align:right;font-family:var(--mono)}
 .cond-table td:nth-child(2){font-weight:700;color:var(--c-navy)}
 .cond-table td:nth-child(3){color:var(--c-gray)}
+
+/* ══════ QUOTE TABLE ROWS ══════ */
+.q-row td{border-bottom:1px solid var(--c-row);font-size:.76rem}
+.q-row .q-name{padding:7px 10px;font-weight:600;color:var(--c-dark)}
+.q-row .q-center{padding:7px 6px;text-align:center;color:#475569}
+.q-row .q-mono{font-family:var(--mono)}
+.q-row .q-lista{padding:7px 8px;text-align:right;font-family:var(--mono);font-weight:600;color:var(--c-navy);font-size:.78rem}
+.q-row .q-contado{padding:7px 10px;text-align:right;font-family:var(--mono);font-weight:700;color:#15803d;font-size:.78rem}
+
+/* ══════ HISTORIAL ══════ */
+.hist-card{border:1px solid var(--c-border);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.hist-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.hist-num{font-size:.72rem;font-weight:700;color:var(--c-navy)}
+.hist-date{font-size:.64rem;color:var(--c-gray);margin-left:8px}
+.hist-vendor{font-size:.62rem;font-weight:600;color:var(--c-green)}
+.hist-client{margin:0 0 6px;font-size:.78rem;font-weight:600;color:var(--c-navy)}
+.hist-total{text-align:right;margin-top:4px;padding-top:4px;border-top:1px solid var(--c-border)}
+.hist-total span{font-size:.68rem;font-weight:700;color:var(--c-navy);font-family:var(--mono)}
+.hist-table{width:100%;border-collapse:collapse;font-size:.64rem}
+.hist-table th{padding:3px 4px;color:var(--c-gray);font-weight:600}
+.hist-table td{padding:3px 4px;border-bottom:1px solid var(--c-row)}
+.hist-pager{display:flex;justify-content:center;gap:8px;margin-top:10px}
+.hist-pager button{background:#eef3fb;color:var(--c-blue);font-size:.64rem;font-weight:700;padding:5px 14px;border-radius:99px;border:none;cursor:pointer;font-family:var(--font)}
+.hist-pager button:disabled{opacity:.4;cursor:default}
 
 /* ══════ ANIMATIONS ══════ */
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
@@ -318,7 +343,11 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
           </button>
           <button onclick="Conditions.download()" class="no-print btn-sm" style="background:var(--c-blue);color:#fff;">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            Descargar
+            PNG
+          </button>
+          <button id="btnCondPdf" onclick="Conditions.downloadPDF()" class="no-print btn-sm" style="background:#c0392b;color:#fff;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            PDF
           </button>
         </div>
       </div>
@@ -356,8 +385,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:8px;border-bottom:1.5px solid var(--c-border);">
           <img id="quoteLogo" alt="HenderSeeds" style="height:34px;">
           <div style="text-align:right;">
-            <p style="margin:0;font-size:.88rem;font-weight:700;color:var(--c-navy);" id="q-numero">—</p>
-            <p style="margin:2px 0 0;font-size:.56rem;color:var(--c-light);" id="q-fecha"></p>
+            <p style="margin:0;font-size:.56rem;color:var(--c-light);" id="q-fecha"></p>
           </div>
         </div>
         <div style="margin-bottom:14px;">
@@ -383,6 +411,9 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
       <div style="background:linear-gradient(90deg,var(--c-navy),var(--c-sky));height:4px;"></div>
     </div>
 
+    <!-- Ref number (outside capture area, only visible in overlay) -->
+    <p style="margin:6px 12px 0;font-size:.64rem;font-weight:600;color:rgba(255,255,255,.5);text-align:center;">Ref: <span id="q-numero" style="color:rgba(255,255,255,.8);">—</span></p>
+
     <!-- QUOTE ACTIONS -->
     <div class="quote-actions" style="padding:12px 12px 0;display:flex;gap:8px;">
       <button id="btnShareImg" onclick="Quote.shareImage()" class="btn-share">
@@ -391,7 +422,11 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
       </button>
       <button onclick="Quote.downloadPNG()" class="btn-dl">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-        Descargar
+        PNG
+      </button>
+      <button id="btnDlPdf" onclick="Quote.downloadPDF()" class="btn-dl" style="background:#c0392b;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        PDF
       </button>
     </div>
     <p style="color:rgba(255,255,255,.4);font-size:.68rem;text-align:center;padding:8px 16px 0;">Tocá "Enviar imagen" para compartir por WhatsApp, mail o cualquier app</p>
@@ -437,24 +472,25 @@ const CATALOGO_DEFAULT = {
 const TECH_DATA = {
   maiz: {
     cols: ['Híbrido','Tec.','MR','GDU','P.Mil','Grano','Altura','Stay Green','Vuelco','Rinde','Riego','Secano'],
+    // Each cell: plain string = normal, {b:'class',t:'text'} = badge, {m:true} = mono, {m:true,h:true} = mono+highlight
     rows: [
-      ['NS7765 Viptera3','ba|VT3P','117','830','320g','Cdo. Duro','Med-Alta','ba|Alto','ba|Exc.','ba|★★★★★','ba|✓','bb|✓'],
-      ['NS7621 Viptera3','ba|VT3P','116','820','310g','Cdo. Duro','Media','ba|Alto','ba|Exc.','ba|★★★★★','bb|✓','ba|✓'],
-      ['NS7624 Viptera3CL','bb|VT3CL','116','815','305g','Cdo. Duro','Media','bb|M.Bno','ba|M.Bno','bb|★★★★☆','bb|✓','bb|✓'],
-      ['NS7921 Viptera3CL','bb|VT3CL','119','850','330g','Cdo. Semi','Alta','ba|Alto','bb|Bno','ba|★★★★★','ba|✓','bb|✓'],
-      ['AX7761VT3P','ba|VT3P','117','825','315g','Cdo. Duro','Med-Alta','bb|M.Bno','ba|M.Bno','bb|★★★★☆','bb|✓','bb|✓'],
-      ['NS7818VIP3','ba|VIP3','118','835','290g','Cdo. Duro','Media','bb|Bno','ba|Exc.','bc|★★★☆☆','bb|✓','bb|✓'],
-      ['NS7852 Viptera3','ba|VT3P','118','840','335g','Cdo. Semi','Alta','ba|Alto','bb|Bno','ba|★★★★★','ba|✓','ba|✓'],
-      ['NS7925 Viptera3','ba|VT3P','119','855','340g','Cdo. Duro','Alta','ba|Alto','bb|Bno','ba|★★★★★','ba|✓','bb|✓']
+      [{v:'NS7765 Viptera3'},{b:'ba',t:'VT3P'},{m:1,h:1,v:'117'},{m:1,v:'830'},{m:1,v:'320g'},{v:'Cdo. Duro'},{v:'Med-Alta'},{b:'ba',t:'Alto'},{b:'ba',t:'Exc.'},{b:'ba',t:'★★★★★'},{b:'ba',t:'✓'},{b:'bb',t:'✓'}],
+      [{v:'NS7621 Viptera3'},{b:'ba',t:'VT3P'},{m:1,h:1,v:'116'},{m:1,v:'820'},{m:1,v:'310g'},{v:'Cdo. Duro'},{v:'Media'},{b:'ba',t:'Alto'},{b:'ba',t:'Exc.'},{b:'ba',t:'★★★★★'},{b:'bb',t:'✓'},{b:'ba',t:'✓'}],
+      [{v:'NS7624 Viptera3CL'},{b:'bb',t:'VT3CL'},{m:1,h:1,v:'116'},{m:1,v:'815'},{m:1,v:'305g'},{v:'Cdo. Duro'},{v:'Media'},{b:'bb',t:'M.Bno'},{b:'ba',t:'M.Bno'},{b:'bb',t:'★★★★☆'},{b:'bb',t:'✓'},{b:'bb',t:'✓'}],
+      [{v:'NS7921 Viptera3CL'},{b:'bb',t:'VT3CL'},{m:1,h:1,v:'119'},{m:1,v:'850'},{m:1,v:'330g'},{v:'Cdo. Semi'},{v:'Alta'},{b:'ba',t:'Alto'},{b:'bb',t:'Bno'},{b:'ba',t:'★★★★★'},{b:'ba',t:'✓'},{b:'bb',t:'✓'}],
+      [{v:'AX7761VT3P'},{b:'ba',t:'VT3P'},{m:1,h:1,v:'117'},{m:1,v:'825'},{m:1,v:'315g'},{v:'Cdo. Duro'},{v:'Med-Alta'},{b:'bb',t:'M.Bno'},{b:'ba',t:'M.Bno'},{b:'bb',t:'★★★★☆'},{b:'bb',t:'✓'},{b:'bb',t:'✓'}],
+      [{v:'NS7818VIP3'},{b:'ba',t:'VIP3'},{m:1,h:1,v:'118'},{m:1,v:'835'},{m:1,v:'290g'},{v:'Cdo. Duro'},{v:'Media'},{b:'bb',t:'Bno'},{b:'ba',t:'Exc.'},{b:'bc',t:'★★★☆☆'},{b:'bb',t:'✓'},{b:'bb',t:'✓'}],
+      [{v:'NS7852 Viptera3'},{b:'ba',t:'VT3P'},{m:1,h:1,v:'118'},{m:1,v:'840'},{m:1,v:'335g'},{v:'Cdo. Semi'},{v:'Alta'},{b:'ba',t:'Alto'},{b:'bb',t:'Bno'},{b:'ba',t:'★★★★★'},{b:'ba',t:'✓'},{b:'ba',t:'✓'}],
+      [{v:'NS7925 Viptera3'},{b:'ba',t:'VT3P'},{m:1,h:1,v:'119'},{m:1,v:'855'},{m:1,v:'340g'},{v:'Cdo. Duro'},{v:'Alta'},{b:'ba',t:'Alto'},{b:'bb',t:'Bno'},{b:'ba',t:'★★★★★'},{b:'ba',t:'✓'},{b:'bb',t:'✓'}]
     ]
   },
   girasol: {
     cols: ['Híbrido','Tec.','MR','GDU','P.Mil','Tipo','% Aceite','Altura','Bremia','Jassid','Rinde','Estabil.'],
     rows: [
-      ['NS1113CL','bb|CL','110','1450','65g','A. Oleico','47%','Media','ba|R','ba|R','ba|★★★★★','ba|Alta'],
-      ['NS1227CLHO','bb|CL·HO','112','1480','70g','A. Oleico','49%','Med-Alta','ba|R','ba|R','ba|★★★★★','ba|Alta'],
-      ['NS1115CL','bb|CL','111','1460','62g','Linoleico','44%','Baja-Med','ba|R','bb|MR','bb|★★★★☆','bb|M.Alta'],
-      ['NS1117CL','bb|CL','111','1470','68g','Linoleico','44%','Media','ba|R','ba|R','ba|★★★★★','ba|Alta']
+      [{v:'NS1113CL'},{b:'bb',t:'CL'},{m:1,h:1,v:'110'},{m:1,v:'1450'},{m:1,v:'65g'},{v:'A. Oleico'},{m:1,h:1,v:'47%'},{v:'Media'},{b:'ba',t:'R'},{b:'ba',t:'R'},{b:'ba',t:'★★★★★'},{b:'ba',t:'Alta'}],
+      [{v:'NS1227CLHO'},{b:'bb',t:'CL·HO'},{m:1,h:1,v:'112'},{m:1,v:'1480'},{m:1,v:'70g'},{v:'A. Oleico'},{m:1,h:1,v:'49%'},{v:'Med-Alta'},{b:'ba',t:'R'},{b:'ba',t:'R'},{b:'ba',t:'★★★★★'},{b:'ba',t:'Alta'}],
+      [{v:'NS1115CL'},{b:'bb',t:'CL'},{m:1,h:1,v:'111'},{m:1,v:'1460'},{m:1,v:'62g'},{v:'Linoleico'},{m:1,h:1,v:'44%'},{v:'Baja-Med'},{b:'ba',t:'R'},{b:'bb',t:'MR'},{b:'bb',t:'★★★★☆'},{b:'bb',t:'M.Alta'}],
+      [{v:'NS1117CL'},{b:'bb',t:'CL'},{m:1,h:1,v:'111'},{m:1,v:'1470'},{m:1,v:'68g'},{v:'Linoleico'},{m:1,h:1,v:'44%'},{v:'Media'},{b:'ba',t:'R'},{b:'ba',t:'R'},{b:'ba',t:'★★★★★'},{b:'ba',t:'Alta'}]
     ]
   }
 };
@@ -488,26 +524,49 @@ function makeToggle(id, name, sub, onChange, checked=false) {
 
 // Reusable tech table renderer
 function renderTechTable(data) {
-  const badge = v => { const [cls,txt]=v.split('|'); return `<span class="badge ${cls}">${txt}</span>`; };
   let h='<table class="tech-table"><thead><tr>';
   data.cols.forEach((c,i) => h+=`<th${i===0?' style="text-align:left;padding-right:8px"':''}>${c}</th>`);
   h+='</tr></thead><tbody>';
   data.rows.forEach(row => {
     h+='<tr>';
     row.forEach((cell,i) => {
-      if(i===0) h+=`<td style="padding-right:8px;min-width:${data===TECH_DATA.maiz?148:110}px">${cell}</td>`;
-      else if(cell.includes('|')) h+=`<td>${badge(cell)}</td>`;
-      else if(i===2||i===3||i===4||(data===TECH_DATA.girasol&&i===6)) h+=`<td style="font-family:var(--mono);${i===2||i===6?'font-weight:700;color:var(--c-navy)':''}">${cell}</td>`;
-      else h+=`<td>${cell}</td>`;
+      if(i===0) h+=`<td style="padding-right:8px;min-width:${data===TECH_DATA.maiz?148:110}px">${cell.v}</td>`;
+      else if(cell.b) h+=`<td><span class="badge ${cell.b}">${cell.t}</span></td>`;
+      else if(cell.m) h+=`<td style="font-family:var(--mono);${cell.h?'font-weight:700;color:var(--c-navy)':''}">${cell.v}</td>`;
+      else h+=`<td>${cell.v}</td>`;
     });
     h+='</tr>';
   });
   return h+'</tbody></table>';
 }
 
-// Shared html2canvas capture helper
+// Shared html2canvas capture helper — supports PNG share, PNG download, and PDF download
 async function captureAndShare(el, filename, opts={}) {
   const canvas = await html2canvas(el, {scale:3, useCORS:true, backgroundColor:'#ffffff', logging:false, windowWidth:opts.width||400, width:opts.width||400, height:el.scrollHeight});
+  
+  // PDF mode: render canvas into a perfectly-fitted PDF page
+  if(opts.pdf) {
+    const imgData = canvas.toDataURL('image/png');
+    const pxW = canvas.width, pxH = canvas.height;
+    // Convert pixels to mm at 96 DPI (canvas scale=3 → effective 288 DPI)
+    const mmW = (pxW / 3) * 25.4 / 96;
+    const mmH = (pxH / 3) * 25.4 / 96;
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: mmW > mmH ? 'l' : 'p', unit: 'mm', format: [mmW, mmH] });
+    pdf.addImage(imgData, 'PNG', 0, 0, mmW, mmH, '', 'FAST');
+    const pdfBlob = pdf.output('blob');
+    const pdfFile = new File([pdfBlob], filename.replace(/\.png$/i,'.pdf'), {type:'application/pdf'});
+    if(opts.share && navigator.canShare && navigator.canShare({files:[pdfFile]})) {
+      await navigator.share({files:[pdfFile], title:opts.title||filename});
+      return;
+    }
+    const url = URL.createObjectURL(pdfBlob);
+    const a = document.createElement('a'); a.href=url; a.download=pdfFile.name; a.click();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    return;
+  }
+  
+  // PNG mode (original behavior)
   const blob = await new Promise(r => canvas.toBlob(r,'image/png',1.0));
   if(opts.share && navigator.canShare) {
     const file = new File([blob], filename, {type:'image/png'});
@@ -810,7 +869,7 @@ const Quote = {
 
     $('q-tbody').innerHTML=lc.map((l,idx)=>{
       const bg=idx%2===0?'#fafbfc':'#fff';
-      return `<tr style="background:${bg};"><td style="padding:7px 10px;font-weight:600;font-size:.76rem;color:var(--c-dark);border-bottom:1px solid var(--c-row);">${l.hibrido}</td><td style="padding:7px 6px;text-align:center;font-size:.76rem;color:#475569;border-bottom:1px solid var(--c-row);">B${l.banda}</td><td style="padding:7px 6px;text-align:center;font-family:var(--mono);font-size:.76rem;color:#475569;border-bottom:1px solid var(--c-row);">${+l.cant}</td><td style="padding:7px 8px;text-align:right;font-family:var(--mono);font-weight:600;color:var(--c-navy);font-size:.78rem;border-bottom:1px solid var(--c-row);">\$${fmt(l.unitNeto)}</td><td style="padding:7px 10px;text-align:right;font-family:var(--mono);font-weight:700;color:#15803d;font-size:.78rem;border-bottom:1px solid var(--c-row);">\$${fmt(l.unitNeto*0.92)}</td></tr>`;
+      return `<tr class="q-row" style="background:${bg};"><td class="q-name">${l.hibrido}</td><td class="q-center">B${l.banda}</td><td class="q-center q-mono">${+l.cant}</td><td class="q-lista">\$${fmt(l.unitNeto)}</td><td class="q-contado">\$${fmt(l.unitNeto*0.92)}</td></tr>`;
     }).join('');
   },
   async show() {
@@ -836,6 +895,15 @@ const Quote = {
     if(!lastLC.length) return;
     try { await captureAndShare($('quote-content'), `Cotizacion_${$('cliente').value||'Cliente'}.png`, {width:420}); }
     catch(e) { alert('Error al generar imagen'); }
+  },
+  async downloadPDF() {
+    if(!lastLC.length) return;
+    const btn=$('btnDlPdf'), orig=btn.innerHTML;
+    btn.innerHTML='⏳ Generando...'; btn.disabled=true;
+    try {
+      await captureAndShare($('quote-content'), `Cotizacion_${$('cliente').value||'Cliente'}.pdf`, {pdf:true, width:420});
+    } catch(e) { alert('Error al generar PDF'); }
+    finally { btn.innerHTML=orig; btn.disabled=false; }
   }
 };
 
@@ -896,13 +964,29 @@ const Conditions = {
     finally { card.style.position='absolute'; card.style.left='-9999px'; card.style.zIndex=''; }
   },
   share() { this._capture(true); },
-  download() { this._capture(false); }
+  download() { this._capture(false); },
+  async downloadPDF() {
+    if(!this.data) await this.load();
+    $('cond-share-fecha').innerText=dateStr();
+    $('cond-share-table').innerHTML=this.buildTableHTML(this.data);
+    const card=$('cond-share-card');
+    card.style.position='fixed'; card.style.left='0'; card.style.top='0'; card.style.zIndex='9999';
+    const btn=$('btnCondPdf'), orig=btn.innerHTML;
+    btn.innerHTML='⏳'; btn.disabled=true;
+    try {
+      await captureAndShare($('cond-share-content'), 'Condiciones_Henderseeds.pdf', {pdf:true, title:'Condiciones Comerciales — Henderseeds'});
+    } catch(e) { if(e.name!=='AbortError') alert('Error al generar PDF'); }
+    finally { card.style.position='absolute'; card.style.left='-9999px'; card.style.zIndex=''; btn.innerHTML=orig; btn.disabled=false; }
+  }
 };
 
 /* ══════════════════════════════════════════════════════════════════
    HISTORIAL — últimas cotizaciones desde Sheets
    ══════════════════════════════════════════════════════════════════ */
 const Historial = {
+  _cache: null,
+  _page: 0,
+  _perPage: 10,
   async load() {
     if(!CONFIG.APPS_SCRIPT_URL){ $('historialContent').innerHTML='<p style="color:var(--c-light);font-size:.72rem;">Sin conexión a Sheets</p>'; return; }
     $('historialContent').innerHTML='<p style="color:var(--c-light);font-size:.72rem;">⏳ Cargando...</p>';
@@ -910,36 +994,33 @@ const Historial = {
       const r=await fetch(CONFIG.APPS_SCRIPT_URL+'?action=getHistorial',{redirect:'follow'});
       const data=await r.json();
       if(!Array.isArray(data)||!data.length){ $('historialContent').innerHTML='<p style="color:var(--c-light);font-size:.72rem;">Sin cotizaciones registradas</p>'; return; }
-      this.render(data);
+      this._cache=data; this._page=0;
+      this.render();
     } catch(e) { $('historialContent').innerHTML='<p style="color:#e74c3c;font-size:.72rem;">Error: '+e.message+'</p>'; }
   },
-  render(data) {
+  goPage(delta) { this._page+=delta; this.render(); },
+  render() {
+    const data=this._cache;
+    if(!data) return;
     const groups={};
-    data.forEach(row=>{ const n=row[0]; if(!groups[n])groups[n]={numero:n,fecha:row[1],vendedor:row[2],cliente:row[3],cuit:row[4],items:[]}; groups[n].items.push({hibrido:row[5],banda:row[6],cant:row[7],precio:row[8],bandPct:row[9],pre:row[10],cont:row[11],cre:row[12],cross:row[13],vol:row[14],zonal:row[15],hend:row[16],siva:row[17],civa:row[18]}); });
-    const quotes=Object.values(groups).sort((a,b)=>b.numero-a.numero).slice(0,20);
-    const thStyle='text-align:center;padding:3px 2px;color:var(--c-gray);font-weight:600;';
+    data.forEach(row=>{ const n=row[0]; if(!groups[n])groups[n]={numero:n,fecha:row[1],vendedor:row[2],cliente:row[3],cuit:row[4],items:[]}; groups[n].items.push({hibrido:row[5],banda:row[6],cant:row[7],precio:row[8],pre:row[10],cont:row[11],vol:row[14],zonal:row[15],hend:row[16],siva:row[17]}); });
+    const allQuotes=Object.values(groups).sort((a,b)=>b.numero-a.numero);
+    const totalPages=Math.ceil(allQuotes.length/this._perPage);
+    const quotes=allQuotes.slice(this._page*this._perPage, (this._page+1)*this._perPage);
+
     let h='';
     quotes.forEach(q=>{
       const totalSiva=q.items.reduce((s,i)=>s+(+i.siva||0),0);
-      h+=`<div style="border:1px solid var(--c-border);border-radius:10px;padding:10px 12px;margin-bottom:8px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-          <div><span style="font-size:.72rem;font-weight:700;color:var(--c-navy);">#${String(q.numero).padStart(4,'0')}</span><span style="font-size:.64rem;color:var(--c-gray);margin-left:8px;">${q.fecha}</span></div>
-          <span style="font-size:.62rem;font-weight:600;color:var(--c-green);">${q.vendedor}</span>
-        </div>
-        <p style="margin:0 0 6px;font-size:.78rem;font-weight:600;color:var(--c-navy);">${q.cliente}</p>
-        <div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:.64rem;">
-          <thead><tr style="border-bottom:1px solid var(--c-border);">
-            <th style="text-align:left;padding:3px 4px;color:var(--c-gray);font-weight:600;">Híbrido</th>
-            <th style="${thStyle}">B.</th><th style="${thStyle}">Cant</th>
-            <th style="text-align:right;padding:3px 4px;color:var(--c-gray);font-weight:600;">P.Neto</th>
-            <th style="${thStyle}">Pre</th><th style="${thStyle}">Cdo</th><th style="${thStyle}">Vol</th><th style="${thStyle}">Zon</th><th style="${thStyle}">Hend</th>
-            <th style="text-align:right;padding:3px 4px;color:var(--c-gray);font-weight:600;">s/IVA</th>
-          </tr></thead><tbody>`;
+      h+=`<div class="hist-card"><div class="hist-header"><div><span class="hist-num">#${String(q.numero).padStart(4,'0')}</span><span class="hist-date">${q.fecha}</span></div><span class="hist-vendor">${q.vendedor}</span></div><p class="hist-client">${q.cliente}</p><div style="overflow-x:auto;"><table class="hist-table"><thead><tr><th style="text-align:left">Híbrido</th><th>B.</th><th>Cant</th><th style="text-align:right">P.Neto</th><th>Pre</th><th>Cdo</th><th>Vol</th><th>Zon</th><th>Hend</th><th style="text-align:right">s/IVA</th></tr></thead><tbody>`;
       q.items.forEach(i=>{
-        h+=`<tr style="border-bottom:1px solid var(--c-row);"><td style="padding:3px 4px;font-weight:600;">${i.hibrido}</td><td style="text-align:center;padding:3px 4px;">${i.banda}</td><td style="text-align:center;padding:3px 4px;font-family:var(--mono);">${i.cant}</td><td style="text-align:right;padding:3px 4px;font-family:var(--mono);font-weight:700;color:var(--c-navy);">\$${i.precio}</td><td style="text-align:center;padding:3px 2px;color:#15803d;">${i.pre}</td><td style="text-align:center;padding:3px 2px;color:#15803d;">${i.cont}</td><td style="text-align:center;padding:3px 2px;color:#15803d;">${i.vol}</td><td style="text-align:center;padding:3px 2px;color:#15803d;">${i.zonal}</td><td style="text-align:center;padding:3px 2px;color:#15803d;">${i.hend}</td><td style="text-align:right;padding:3px 4px;font-family:var(--mono);">\$${fmt(+i.siva)}</td></tr>`;
+        h+=`<tr><td style="font-weight:600;text-align:left">${i.hibrido}</td><td style="text-align:center">${i.banda}</td><td style="text-align:center;font-family:var(--mono)">${i.cant}</td><td style="text-align:right;font-family:var(--mono);font-weight:700;color:var(--c-navy)">\$${i.precio}</td><td style="text-align:center;color:#15803d">${i.pre}</td><td style="text-align:center;color:#15803d">${i.cont}</td><td style="text-align:center;color:#15803d">${i.vol}</td><td style="text-align:center;color:#15803d">${i.zonal}</td><td style="text-align:center;color:#15803d">${i.hend}</td><td style="text-align:right;font-family:var(--mono)">\$${fmt(+i.siva)}</td></tr>`;
       });
-      h+=`</tbody></table></div><div style="text-align:right;margin-top:4px;padding-top:4px;border-top:1px solid var(--c-border);"><span style="font-size:.68rem;font-weight:700;color:var(--c-navy);font-family:var(--mono);">Total s/IVA: USD ${fmt(totalSiva)}</span></div></div>`;
+      h+=`</tbody></table></div><div class="hist-total"><span>Total s/IVA: USD ${fmt(totalSiva)}</span></div></div>`;
     });
+
+    if(totalPages>1) {
+      h+=`<div class="hist-pager"><button onclick="Historial.goPage(-1)" ${this._page===0?'disabled':''}>← Anterior</button><span style="font-size:.64rem;color:var(--c-gray);padding:5px 0;">${this._page+1} / ${totalPages}</span><button onclick="Historial.goPage(1)" ${this._page>=totalPages-1?'disabled':''}>Siguiente →</button></div>`;
+    }
     $('historialContent').innerHTML=h;
   }
 };

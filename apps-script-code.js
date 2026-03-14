@@ -5,6 +5,7 @@ function doGet(e) {
   if (action === 'getCatalogo') return jsonResponse(getCatalogo());
   if (action === 'getNextNumber') return jsonResponse({ numero: getNextQuoteNumber() });
   if (action === 'getCondiciones') return jsonResponse(getCondiciones());
+  if (action === 'getHistorial') return jsonResponse(getHistorial());
   return jsonResponse({ error: 'Acción no reconocida' });
 }
 
@@ -43,7 +44,6 @@ function getCatalogo() {
   return catalogo;
 }
 
-// Lee hoja "Condiciones": Moneda | Detalle | TNA | TEA | Plazo(d)
 function getCondiciones() {
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   var sheet = ss.getSheetByName('Condiciones');
@@ -62,6 +62,24 @@ function getCondiciones() {
     });
   }
   return result;
+}
+
+// Devuelve las últimas 100 filas de Cotizaciones (sin encabezado)
+function getHistorial() {
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var sheet = ss.getSheetByName('Cotizaciones');
+  var lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return [];
+  
+  // Traer últimas 100 filas como máximo
+  var startRow = Math.max(2, lastRow - 99);
+  var numRows = lastRow - startRow + 1;
+  var numCols = 19; // N° hasta Total c/IVA
+  
+  var range = sheet.getRange(startRow, 1, numRows, numCols);
+  var values = range.getValues();
+  
+  return values;
 }
 
 function getNextQuoteNumber() {

@@ -4,6 +4,7 @@ function doGet(e) {
   var action = e.parameter.action;
   if (action === 'getCatalogo') return jsonResponse(getCatalogo());
   if (action === 'getNextNumber') return jsonResponse({ numero: getNextQuoteNumber() });
+  if (action === 'getCondiciones') return jsonResponse(getCondiciones());
   return jsonResponse({ error: 'Acción no reconocida' });
 }
 
@@ -42,6 +43,27 @@ function getCatalogo() {
   return catalogo;
 }
 
+// Lee hoja "Condiciones": Moneda | Detalle | TNA | TEA | Plazo(d)
+function getCondiciones() {
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var sheet = ss.getSheetByName('Condiciones');
+  if (!sheet) return [];
+  var data = sheet.getDataRange().getValues();
+  var result = [];
+  for (var i = 1; i < data.length; i++) {
+    var moneda = data[i][0], detalle = data[i][1], tna = data[i][2], tea = data[i][3], plazo = data[i][4];
+    if (!moneda && !detalle) continue;
+    result.push({
+      moneda: String(moneda || '').trim(),
+      detalle: String(detalle || '').trim(),
+      tna: String(tna || '').trim(),
+      tea: String(tea || '').trim(),
+      plazo: String(plazo || '').trim()
+    });
+  }
+  return result;
+}
+
 function getNextQuoteNumber() {
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   var sheet = ss.getSheetByName('Cotizaciones');
@@ -52,7 +74,7 @@ function getNextQuoteNumber() {
 }
 
 // UNA FILA POR ÍTEM
-// Columnas: N° | Fecha | Vendedor | Cliente | CUIT | Híbrido | Banda | Cant | Precio Neto | Band% | Pre-Camp% | Contado% | Crecer% | Cross% | Vol% | Zonal% | Hend% | Total s/IVA | Total c/IVA
+// N° | Fecha | Vendedor | Cliente | CUIT | Híbrido | Banda | Cant | Precio Neto | Band% | Pre-Camp% | Contado% | Crecer% | Cross% | Vol% | Zonal% | Hend% | Total s/IVA | Total c/IVA
 function registrarCotizacion(data) {
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   var sheet = ss.getSheetByName('Cotizaciones');

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Henderseeds — Cotizador Nidera</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 /* ══════ RESET & BASE ══════ */
@@ -172,6 +172,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     <button class="tab-btn active" id="tab-calc" onclick="App.switchTab('calc')">🌽 Cotizador</button>
     <button class="tab-btn" id="tab-market" onclick="App.switchTab('market')">📋 Precios</button>
     <button class="tab-btn" id="tab-tech" onclick="App.switchTab('tech')">🔬 Técnicos</button>
+    <button class="tab-btn" id="tab-cond" onclick="App.switchTab('cond')">💰 Condiciones</button>
   </div>
 
   <!-- ══════════ TAB: COTIZADOR ══════════ -->
@@ -218,7 +219,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
         <button onclick="Calc.addLine()" class="no-print" style="background:#89ba16;color:#fff;font-size:.72rem;font-weight:700;padding:7px 15px;border-radius:99px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 2px 8px rgba(137,186,22,.26);">+ Agregar Híbrido</button>
       </div>
       <div class="mob-wrap" style="overflow-x:auto;">
-        <table class="htable"><thead><tr><th>Híbrido</th><th>Banda</th><th>Cant.</th><th>P.&nbsp;Neto</th><th>Tot.&nbsp;s/IVA</th><th>Tot.&nbsp;c/IVA</th><th class="no-print" style="width:28px;"></th></tr></thead><tbody id="lineasBody"></tbody></table>
+        <table class="htable"><thead><tr><th>Híbrido</th><th>Banda</th><th>Cant.</th><th>P.&nbsp;Neto</th><th class="no-print" style="width:28px;"></th></tr></thead><tbody id="lineasBody"></tbody></table>
       </div>
     </div>
 
@@ -266,7 +267,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
           <div class="dto-row"><span class="dto-emoji">🌻</span><div class="stepper"><button type="button" onclick="Market.step('mktProdG',-0.5)">−</button><input type="number" id="mktProdG" value="0" min="0" max="15" step="0.5" class="stepper-val" onchange="Market.render()"><button type="button" onclick="Market.step('mktProdG',0.5)">+</button></div></div>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><label style="font-size:.63rem;font-weight:600;color:#64748b;white-space:nowrap;">Vol %:</label><div class="stepper" style="max-width:140px;"><button type="button" onclick="Market.step('mktVol',-0.5)">−</button><input type="number" id="mktVol" value="0" min="0" max="12" step="0.5" class="stepper-val" onchange="Market.render()"><button type="button" onclick="Market.step('mktVol',0.5)">+</button></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+        <div class="dto-group"><p class="dto-title">Volumen</p>
+          <div class="dto-row"><span class="dto-emoji">🌽</span><div class="stepper"><button type="button" onclick="Market.step('mktVolM',-0.5)">−</button><input type="number" id="mktVolM" value="0" min="0" max="12" step="0.5" class="stepper-val" onchange="Market.render()"><button type="button" onclick="Market.step('mktVolM',0.5)">+</button></div></div>
+          <div class="dto-row"><span class="dto-emoji">🌻</span><div class="stepper"><button type="button" onclick="Market.step('mktVolG',-0.5)">−</button><input type="number" id="mktVolG" value="0" min="0" max="12" step="0.5" class="stepper-val" onchange="Market.render()"><button type="button" onclick="Market.step('mktVolG',0.5)">+</button></div></div>
+        </div>
+        <div></div>
+      </div>
       <div id="tableMktMaiz" style="margin-bottom:16px;"></div>
       <div id="tableMktGirasol"></div>
     </div>
@@ -302,6 +309,39 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
   </div>
 </div>
 
+
+  <!-- ══════════ TAB: CONDICIONES COMERCIALES ══════════ -->
+  <div id="cond" style="display:none;">
+    <div class="hcard fu" style="padding:16px 18px;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <p class="slabel" style="margin:0;">Condiciones Comerciales</p>
+        <button onclick="Conditions.share()" class="no-print" style="background:#25d366;color:#fff;font-size:.68rem;font-weight:700;padding:6px 14px;border-radius:99px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 2px 8px rgba(37,211,102,.26);display:flex;align-items:center;gap:5px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Compartir
+        </button>
+      </div>
+      <div id="condTable"><p style="color:#94a3b8;font-size:.75rem;">⏳ Cargando condiciones...</p></div>
+    </div>
+
+    <!-- Hidden: shareable conditions card -->
+    <div id="cond-share-card" style="position:absolute;left:-9999px;top:0;width:540px;">
+      <div id="cond-share-content" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.3);">
+        <div style="background:linear-gradient(90deg,#0d2d5e,#1a4a8a,#2d6fc4);height:6px;"></div>
+        <div style="padding:22px 22px 18px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1.5px solid #e2e8f0;">
+            <img src="''' + LOGO_NID + '''" alt="Nidera Semillas" style="height:48px;width:auto;object-fit:contain;">
+            <img src="''' + LOGO_HS + '''" alt="HenderSeeds" style="height:56px;width:auto;object-fit:contain;">
+          </div>
+          <p style="margin:0 0 4px;font-size:.82rem;font-weight:600;font-family:'Playfair Display',serif;font-style:italic;color:#0d2d5e;">Condiciones Comerciales</p>
+          <p style="margin:0 0 14px;font-size:.68rem;color:#94a3b8;font-family:'Playfair Display',serif;font-style:italic;" id="cond-share-fecha"></p>
+          <div id="cond-share-table"></div>
+          <p style="font-size:.58rem;color:#b8cfef;text-align:center;margin:12px 0 0;">Sujeto a confirmación — Henderseeds S.R.L.</p>
+        </div>
+        <div style="background:linear-gradient(90deg,#0d2d5e,#2d6fc4);height:4px;"></div>
+      </div>
+    </div>
+  </div>
+
 <!-- ══════════ QUOTE OVERLAY ══════════ -->
 <div id="quote-overlay">
   <div id="quote-inner">
@@ -330,26 +370,24 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
         <!-- Número + fecha -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
           <div>
-            <p style="margin:0;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#89ba16;">Cotización Comercial</p>
-            <p style="margin:3px 0 0;font-size:.72rem;color:#64748b;" id="q-fecha"></p>
+            <p style="margin:0;font-size:.82rem;font-weight:600;font-family:'Playfair Display',serif;font-style:italic;color:#0d2d5e;letter-spacing:.02em;">Cotización Comercial</p>
+            <p style="margin:4px 0 0;font-size:.68rem;color:#94a3b8;font-family:'Playfair Display',serif;font-style:italic;" id="q-fecha"></p>
           </div>
           <div style="display:none;" id="q-numero-wrap">
             <p id="q-numero">—</p>
           </div>
         </div>
 
-        <!-- Vendedor + Cliente -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
-          <div style="background:#f0fce0;border-radius:8px;padding:8px 12px;">
-            <p style="margin:0;font-size:.52rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#15803d;">Vendedor</p>
-            <p style="margin:3px 0 0;font-size:.84rem;font-weight:700;color:#0d2d5e;" id="q-vendedor">—</p>
-          </div>
-          <div style="background:#eef3fb;border-radius:8px;padding:8px 12px;">
-            <p style="margin:0;font-size:.52rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#1a4a8a;">Cliente</p>
-            <p style="margin:3px 0 0;font-size:.84rem;font-weight:700;color:#0d2d5e;" id="q-cliente">—</p>
-            <p style="margin:2px 0 0;font-size:.72rem;font-weight:600;color:#64748b;font-family:'DM Mono',monospace;" id="q-cuit"></p>
-          </div>
+        <!-- Cliente -->
+        <div style="background:#eef3fb;border-radius:8px;padding:10px 14px;margin-bottom:12px;">
+          <p style="margin:0;font-size:.52rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#1a4a8a;">Cliente</p>
+          <p style="margin:3px 0 0;font-size:.96rem;font-weight:700;color:#0d2d5e;" id="q-cliente">—</p>
         </div>
+        <!-- Hidden fields for internal use -->
+        <div style="display:none;"><span id="q-vendedor"></span><span id="q-cuit"></span></div>
+
+        <!-- Descuentos aplicados -->
+        <div id="q-descuentos" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;font-size:.68rem;"></div>
 
         <!-- Tabla productos -->
         <table style="width:100%;border-collapse:collapse;margin-bottom:16px;font-family:'DM Sans',sans-serif;">
@@ -448,17 +486,19 @@ const App = {
     $('vendor-overlay').classList.remove('hidden');
   },
   switchTab(id) {
-    ['calc','market','tech'].forEach(t => {
+    ['calc','market','tech','cond'].forEach(t => {
       $(t).style.display = t===id ? 'block' : 'none';
       $('tab-'+t).className = 'tab-btn'+(t===id?' active':'');
     });
     if (id==='market') Market.render();
+    if (id==='cond') Conditions.load();
   },
   async loadCatalog() {
     if (!CONFIG.APPS_SCRIPT_URL) {
       $('catalogStatus').textContent = '📦 Catálogo local';
       return;
     }
+    $('catalogStatus').textContent = '⏳ Cargando...';
     try {
       const r = await fetch(CONFIG.APPS_SCRIPT_URL+'?action=getCatalogo');
       const d = await r.json();
@@ -549,8 +589,8 @@ const Calc = {
           <span class="print-only" style="font-size:.76rem;">${l.cant}</span>
         </td>
         <td data-label="P. Neto" id="u-neto-${i}" style="padding-right:4px;font-family:'DM Mono',monospace;font-size:.78rem;font-weight:700;color:#0d2d5e;">-</td>
-        <td data-label="Tot. s/IVA" id="u-siva-${i}" style="padding-right:4px;font-family:'DM Mono',monospace;font-size:.78rem;font-weight:600;color:#475569;">-</td>
-        <td data-label="Tot. c/IVA" id="s-civa-${i}" style="padding-right:4px;font-family:'DM Mono',monospace;font-size:.78rem;font-weight:700;color:#0d2033;">-</td>
+        <td style="display:none;" id="u-siva-${i}">-</td>
+        <td style="display:none;" id="s-civa-${i}">-</td>
         <td class="no-print" style="padding:0;width:26px;"><button onclick="Calc.removeLine(${i})" style="width:24px;height:24px;border-radius:50%;border:none;background:none;color:#fca5a5;cursor:pointer;font-size:.88rem;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='none'">✕</button></td>
       </tr>`).join('');
     this.run();
@@ -634,11 +674,12 @@ const Market = {
     const fCont=$('mktContado').checked?.92:1;
     const fCre=$('mktCrecer').checked?.975:1;
     const fCro=$('mktCross').checked?.95:1;
-    const fV=1-+$('mktVol').value/100;
+    const fVm=1-+$('mktVolM').value/100;
+    const fVg=1-+$('mktVolG').value/100;
     const fZPm=(1-+$('mktZonalM').value/100)*(1-+$('mktProdM').value/100);
     const fZPg=(1-+$('mktZonalG').value/100)*(1-+$('mktProdG').value/100);
 
-    const draw = (t,el,fp,fZP) => {
+    const draw = (t,el,fp,fZP,fV) => {
       const label=t==='maiz'?'🌽 Maíz — Precio Neto':'🌻 Girasol — Precio Neto';
       let h=`<p style="margin:0 0 10px;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#1a4a8a;">${label}</p>`;
       h+='<table class="mkt-table"><thead><tr><th style="text-align:left;">Híbrido</th><th>B1</th><th>B2</th>';
@@ -654,8 +695,8 @@ const Market = {
       });
       $(el).innerHTML=h+'</tbody></table>';
     };
-    draw('maiz','tableMktMaiz',fPreM,fZPm);
-    draw('girasol','tableMktGirasol',fPreG,fZPg);
+    draw('maiz','tableMktMaiz',fPreM,fZPm,fVm);
+    draw('girasol','tableMktGirasol',fPreG,fZPg,fVg);
   }
 };
 
@@ -716,6 +757,25 @@ const Quote = {
     $('q-cliente').innerText=$('cliente').value||'—';
     $('q-cuit').innerText=$('cuit').value||'';
     $('q-neto').innerText=`USD ${fmt(net)}`;
+    
+    // Build descuentos summary for quote
+    const hasMaiz=lc.some(l=>l.tipo==='maiz'), hasGira=lc.some(l=>l.tipo==='girasol');
+    let dHtml='';
+    if(hasMaiz){
+      const m=lc.find(l=>l.tipo==='maiz');
+      dHtml+=`<div style="background:#f8faff;border-radius:6px;padding:6px 10px;border-left:3px solid #89ba16;">
+        <p style="margin:0 0 3px;font-size:.56rem;font-weight:700;color:#89ba16;text-transform:uppercase;">🌽 Maíz</p>
+        <p style="margin:0;font-size:.62rem;color:#475569;line-height:1.5;">Zonal: ${m.valZ}% · Hend: ${m.valP}% · Vol: ${m.pVol}%</p>
+      </div>`;
+    }
+    if(hasGira){
+      const g=lc.find(l=>l.tipo==='girasol');
+      dHtml+=`<div style="background:#f8faff;border-radius:6px;padding:6px 10px;border-left:3px solid #f59e0b;">
+        <p style="margin:0 0 3px;font-size:.56rem;font-weight:700;color:#f59e0b;text-transform:uppercase;">🌻 Girasol</p>
+        <p style="margin:0;font-size:.62rem;color:#475569;line-height:1.5;">Zonal: ${g.valZ}% · Hend: ${g.valP}% · Vol: ${g.pVol}%</p>
+      </div>`;
+    }
+    $('q-descuentos').innerHTML=dHtml;
     $('q-iva').innerText=`USD ${fmt(net*CONFIG.IVA)}`;
     $('q-final').innerText=`USD ${fmt(net*(1+CONFIG.IVA))}`;
 
@@ -762,6 +822,78 @@ const Quote = {
     } catch(e) {
       if(e.name!=='AbortError') alert('No se pudo generar la imagen. Intentá con Ctrl+P.');
     } finally { btn.innerHTML=orig;btn.disabled=false; }
+  }
+};
+
+/* ══════════════════════════════════════════════════════════════════
+   CONDITIONS — condiciones comerciales from Sheets
+   ══════════════════════════════════════════════════════════════════ */
+const Conditions = {
+  data: null,
+  async load() {
+    if (this.data) { this.renderTable(); return; }
+    if (!CONFIG.APPS_SCRIPT_URL) {
+      $('condTable').innerHTML='<p style="color:#94a3b8;font-size:.75rem;">Sin conexión a Sheets</p>';
+      return;
+    }
+    try {
+      const r=await fetch(CONFIG.APPS_SCRIPT_URL+'?action=getCondiciones');
+      this.data=await r.json();
+      this.renderTable();
+    } catch(e) {
+      $('condTable').innerHTML='<p style="color:#e74c3c;font-size:.75rem;">Error al cargar condiciones</p>';
+    }
+  },
+  buildTableHTML(data) {
+    if (!data||!data.length) return '<p style="color:#94a3b8;font-size:.75rem;">Sin condiciones cargadas</p>';
+    let h='<table style="width:100%;border-collapse:collapse;font-size:.76rem;"><thead><tr style="background:linear-gradient(90deg,#0d2d5e,#1a4a8a);">';
+    h+='<th style="padding:8px 10px;text-align:left;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#fff;">Moneda</th>';
+    h+='<th style="padding:8px 10px;text-align:left;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#fff;">Detalle</th>';
+    h+='<th style="padding:8px 8px;text-align:center;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#fff;">TNA</th>';
+    h+='<th style="padding:8px 8px;text-align:center;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#fff;">TEA</th>';
+    h+='<th style="padding:8px 8px;text-align:center;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#fff;">Plazo</th>';
+    h+='</tr></thead><tbody>';
+    data.forEach((r,i)=>{
+      const bg=i%2===0?'#f8faff':'#fff';
+      h+=`<tr style="background:${bg};">`;
+      h+=`<td style="padding:7px 10px;border-bottom:1px solid #f1f5f9;font-weight:600;color:#0d2d5e;">${r.moneda}</td>`;
+      h+=`<td style="padding:7px 10px;border-bottom:1px solid #f1f5f9;">${r.detalle}</td>`;
+      h+=`<td style="padding:7px 8px;text-align:center;border-bottom:1px solid #f1f5f9;font-family:'DM Mono',monospace;font-weight:700;color:#0d2d5e;">${r.tna}</td>`;
+      h+=`<td style="padding:7px 8px;text-align:center;border-bottom:1px solid #f1f5f9;font-family:'DM Mono',monospace;color:#64748b;">${r.tea}</td>`;
+      h+=`<td style="padding:7px 8px;text-align:center;border-bottom:1px solid #f1f5f9;font-family:'DM Mono',monospace;">${r.plazo}d</td>`;
+      h+='</tr>';
+    });
+    return h+'</tbody></table>';
+  },
+  renderTable() {
+    $('condTable').innerHTML=this.buildTableHTML(this.data);
+  },
+  async share() {
+    if (!this.data) await this.load();
+    $('cond-share-fecha').innerText=dateStr();
+    $('cond-share-table').innerHTML=this.buildTableHTML(this.data);
+
+    // Move card to visible area briefly for capture
+    const card=$('cond-share-card');
+    card.style.position='fixed';card.style.left='0';card.style.top='0';card.style.zIndex='9999';
+    
+    try {
+      const el=$('cond-share-content');
+      const canvas=await html2canvas(el,{scale:3,useCORS:true,backgroundColor:'#ffffff',logging:false,windowWidth:540,width:540,height:el.scrollHeight});
+      const blob=await new Promise(r=>canvas.toBlob(r,'image/png',1.0));
+      const file=new File([blob],'Condiciones_Henderseeds.png',{type:'image/png'});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){
+        await navigator.share({files:[file],title:'Condiciones Comerciales — Henderseeds'});
+      } else {
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement('a');a.href=url;a.download='Condiciones_Henderseeds.png';a.click();
+        setTimeout(()=>URL.revokeObjectURL(url),1000);
+      }
+    } catch(e) {
+      if(e.name!=='AbortError') alert('Error al generar imagen');
+    } finally {
+      card.style.position='absolute';card.style.left='-9999px';card.style.zIndex='';
+    }
   }
 };
 

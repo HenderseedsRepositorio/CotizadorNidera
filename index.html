@@ -139,8 +139,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     <h2>Cotizador Nidera</h2>
     <p>Seleccioná tu nombre para empezar</p>
     <button class="vendor-btn" onclick="App.selectVendor('Alvaro')">Alvaro</button>
-    <button class="vendor-btn" onclick="App.selectVendor('Socio 1')">Socio 1</button>
-    <button class="vendor-btn" onclick="App.selectVendor('Socio 2')">Socio 2</button>
+    <button class="vendor-btn" onclick="App.selectVendor('Gonzalo')">Gonzalo</button>
+    <button class="vendor-btn" onclick="App.selectVendor('Juan Augusto')">Juan Augusto</button>
   </div>
 </div>
 
@@ -633,16 +633,36 @@ const Market = {
 const Sheets = {
   async register() {
     if (!CONFIG.APPS_SCRIPT_URL) return null;
-    const net=lastLC.reduce((s,l)=>s+l.totalSIVA,0);
     try {
+      const bandPct = (tipo, banda) => {
+        if (banda === 1) return 0;
+        if (tipo === 'maiz') return banda === 2 ? 4 : 8;
+        return banda === 2 ? 5 : 0;
+      };
+      const rows = lastLC.map(l => ({
+        hibrido: l.hibrido,
+        banda: l.banda,
+        bandPct: bandPct(l.tipo, l.banda),
+        cant: +l.cant,
+        precioNeto: Math.round(l.unitNeto),
+        pPre: l.pPre,
+        pCont: l.pCont,
+        pCre: l.pCre,
+        pCro: l.pCro,
+        pVol: l.pVol,
+        valZ: l.valZ,
+        valP: l.valP,
+        totalSIVA: Math.round(l.totalSIVA),
+        totalCIVA: Math.round(l.totalCIVA)
+      }));
       const r=await fetch(CONFIG.APPS_SCRIPT_URL,{
         method:'POST',headers:{'Content-Type':'text/plain'},
         body:JSON.stringify({
-          action:'registrar',vendedor:vendor,
-          cliente:$('cliente').value||'—',cuit:$('cuit').value||'—',
-          lineas:lastLC.map(l=>({hibrido:l.hibrido,banda:l.banda,cant:+l.cant,unitNeto:Math.round(l.unitNeto)})),
-          totalNeto:Math.round(net),totalIVA:Math.round(net*CONFIG.IVA),totalFinal:Math.round(net*(1+CONFIG.IVA)),
-          descuentos:{preCampaña:$('chkPre').checked,contado:$('chkContado').checked,crecer:$('chkCrecer').checked,cross:$('chkCross').checked,zonalMaiz:+$('valZM').value,zonalGirasol:+$('valZG').value,hendMaiz:+$('valPM').value,hendGirasol:+$('valPG').value}
+          action:'registrar',
+          vendedor:vendor,
+          cliente:$('cliente').value||'—',
+          cuit:$('cuit').value||'—',
+          items:rows
         })
       });
       const d=await r.json();

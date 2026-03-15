@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Henderseeds — Cotizador Nidera</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
@@ -12,9 +12,10 @@
 *,*::before,*::after{box-sizing:border-box}
 :root{
   --c-navy:#0d2d5e;--c-blue:#1a4a8a;--c-sky:#2d6fc4;--c-green:#89ba16;
+  --c-orange:#F5A623;--c-yellow:#F59E0B;
   --c-dark:#0d2033;--c-gray:#64748b;--c-light:#94a3b8;--c-border:#e2e8f0;
   --c-bg:#f0f4fb;--c-card:#fff;--c-accent:#b8cfef;--c-row:#f1f5f9;
-  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;--display:'Archivo Black',sans-serif;
 }
 body{background:var(--c-bg);font-family:var(--font);color:var(--c-dark);margin:0;padding:0;-webkit-text-size-adjust:100%}
 
@@ -151,6 +152,60 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .fu{animation:fadeUp .26s ease both}
 .fu1{animation-delay:.05s}.fu2{animation-delay:.1s}.fu3{animation-delay:.16s}
+
+/* ══════ FICHA TÉCNICA ══════ */
+.tech-filters{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tech-pill{padding:6px 14px;border-radius:99px;border:1.5px solid var(--c-border);font-size:.7rem;font-weight:600;font-family:var(--font);cursor:pointer;background:var(--c-card);color:var(--c-gray);transition:all .15s}
+.tech-pill.active{border-color:var(--c-navy);background:var(--c-navy);color:#fff}
+.tech-pill.tp-maiz.active{border-color:var(--c-orange);background:var(--c-orange);color:var(--c-navy)}
+.tech-pill.tp-girasol.active{border-color:var(--c-yellow);background:var(--c-yellow);color:var(--c-navy)}
+.tcard{background:var(--c-card);border-radius:14px;box-shadow:0 2px 12px rgba(13,45,94,.07);margin-bottom:8px;overflow:hidden;transition:box-shadow .2s}
+.tcard:hover{box-shadow:0 4px 20px rgba(13,45,94,.12)}
+.tcard-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;gap:8px}
+.tcard-left{flex:1;min-width:0}
+.tcard-name{font-family:var(--display);font-size:.82rem;color:var(--c-navy);margin:0;line-height:1.2}
+.tcard-tec{display:inline-block;font-size:.54rem;font-weight:700;padding:2px 7px;border-radius:99px;margin-top:3px}
+.tec-vt3p{background:#dcfce7;color:#15803d}.tec-vip3{background:#dbeafe;color:#1e40af}.tec-cl{background:#fef3c7;color:#92400e}.tec-cltg{background:#f3e8ff;color:#6b21a8}
+.tcard-mr{text-align:right;flex-shrink:0}
+.tcard-mr-val{font-family:var(--mono);font-size:1.1rem;font-weight:700;color:var(--c-navy);line-height:1}
+.tcard-mr-label{font-size:.5rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--c-light);margin-top:1px}
+.tcard-arrow{font-size:.7rem;color:var(--c-light);transition:transform .2s;flex-shrink:0;margin-left:4px}
+.tcard.open .tcard-arrow{transform:rotate(180deg)}
+.tcard-body{display:none;padding:0 14px 14px}
+.tcard.open .tcard-body{display:block}
+.tdesc{font-size:.72rem;color:var(--c-gray);line-height:1.5;margin:0 0 12px;border-left:3px solid var(--c-orange);padding-left:10px}
+.tdesc.girasol-desc{border-left-color:var(--c-yellow)}
+.tstats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.tstat{background:var(--c-bg);border-radius:8px;padding:7px 6px;text-align:center}
+.tstat-val{font-family:var(--mono);font-size:.82rem;font-weight:700;color:var(--c-navy)}
+.tstat-label{font-size:.48rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--c-light);margin-top:2px}
+.sanit-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.sanit-name{font-size:.65rem;font-weight:600;color:var(--c-dark);width:85px;flex-shrink:0;text-align:right}
+.sanit-bar-wrap{flex:1;height:16px;background:#eef3fb;border-radius:8px;overflow:hidden}
+.sanit-bar{height:100%;border-radius:8px;transition:width .4s ease}
+.sanit-bar.s-exc{background:linear-gradient(90deg,#22c55e,#16a34a)}
+.sanit-bar.s-good{background:linear-gradient(90deg,#86efac,#22c55e)}
+.sanit-bar.s-mod{background:linear-gradient(90deg,#fbbf24,#f59e0b)}
+.sanit-bar.s-fair{background:linear-gradient(90deg,#fb923c,#ea580c)}
+.sanit-bar.s-poor{background:linear-gradient(90deg,#f87171,#dc2626)}
+.sanit-bar.s-res{background:linear-gradient(90deg,#2d6fc4,#1a4a8a)}
+.sanit-val{font-family:var(--mono);font-size:.62rem;font-weight:700;color:var(--c-navy);width:22px;text-align:center;flex-shrink:0}
+.ensayo-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--c-row)}
+.ensayo-row:last-child{border-bottom:none}
+.ensayo-epoca{font-size:.62rem;font-weight:600;color:var(--c-dark);width:90px;flex-shrink:0}
+.ensayo-exito{font-family:var(--mono);font-size:.72rem;font-weight:700;width:42px;text-align:center;flex-shrink:0}
+.ensayo-exito.e-hi{color:#15803d}.ensayo-exito.e-mid{color:var(--c-orange)}.ensayo-exito.e-lo{color:#dc2626}
+.ensayo-n{font-size:.58rem;color:var(--c-light);width:36px;text-align:center;flex-shrink:0}
+.ensayo-dif{font-family:var(--mono);font-size:.7rem;font-weight:700;flex:1;text-align:right}
+.ensayo-dif.d-pos{color:#15803d}.ensayo-dif.d-neg{color:#dc2626}.ensayo-dif.d-dns{color:var(--c-gray)}
+.tambientes{display:flex;gap:4px;margin-bottom:12px}
+.tamb{font-size:.56rem;font-weight:700;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.05em}
+.tamb.on{background:#dcfce7;color:#15803d}.tamb.off{background:var(--c-row);color:#cbd5e1}
+.btn-marbete{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;border-radius:10px;border:1.5px solid var(--c-navy);background:transparent;color:var(--c-navy);font-family:var(--font);font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;text-decoration:none}
+.btn-marbete:hover{background:var(--c-navy);color:#fff}
+.btn-marbete.disabled{opacity:.4;cursor:default;pointer-events:none}
+@keyframes tcardIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.tcard{animation:tcardIn .25s ease both}
 
 /* ══════ PRINT ══════ */
 @media print{
@@ -320,15 +375,12 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 
   <!-- ══════════ TAB: TÉCNICOS ══════════ -->
   <div id="tech" style="display:none;">
-    <div class="hcard" style="padding:14px 18px;margin-bottom:10px;">
-      <p class="slabel">🌽 Maíz — Datos Técnicos</p>
-      <div style="overflow-x:auto;" id="techMaiz"></div>
+    <div class="tech-filters" id="techFilters">
+      <button class="tech-pill active" onclick="TechFicha.filter('all',this)">Todos</button>
+      <button class="tech-pill tp-maiz" onclick="TechFicha.filter('maiz',this)">🌽 Maíz</button>
+      <button class="tech-pill tp-girasol" onclick="TechFicha.filter('girasol',this)">🌻 Girasol</button>
     </div>
-    <div class="hcard" style="padding:14px 18px;margin-bottom:10px;">
-      <p class="slabel">🌻 Girasol — Datos Técnicos</p>
-      <div style="overflow-x:auto;" id="techGirasol"></div>
-    </div>
-    <div class="hcard" style="padding:10px 16px;"><p class="slabel" style="margin-bottom:7px;">Referencias</p><div style="display:flex;flex-wrap:wrap;gap:6px;font-size:.65rem;color:#475569;"><span><span class="badge ba">●</span> Excelente/Resistente</span><span><span class="badge bb">●</span> Muy Bueno/Mod.Resistente</span><span><span class="badge bc">●</span> Bueno</span><span style="color:var(--c-gray)"><b>MR</b>=Madurez Relativa · <b>VT3P</b>=Viptera3 Power · <b>CL</b>=Clearfield · <b>HO</b>=Alto Oleico</span></div></div>
+    <div id="techCards"><p style="color:var(--c-light);font-size:.75rem;">Tocá la pestaña "Técnicos" para cargar las fichas</p></div>
   </div>
 
   <!-- ══════════ TAB: CONDICIONES ══════════ -->
@@ -467,35 +519,6 @@ const CATALOGO_DEFAULT = {
 };
 
 /* ══════════════════════════════════════════════════════════════════
-   TECHNICAL DATA
-   ══════════════════════════════════════════════════════════════════ */
-const TECH_DATA = {
-  maiz: {
-    cols: ['Híbrido','Tec.','MR','GDU','P.Mil','Grano','Altura','Stay Green','Vuelco','Rinde','Riego','Secano'],
-    // Each cell: plain string = normal, {b:'class',t:'text'} = badge, {m:true} = mono, {m:true,h:true} = mono+highlight
-    rows: [
-      [{v:'NS7765 Viptera3'},{b:'ba',t:'VT3P'},{m:1,h:1,v:'117'},{m:1,v:'830'},{m:1,v:'320g'},{v:'Cdo. Duro'},{v:'Med-Alta'},{b:'ba',t:'Alto'},{b:'ba',t:'Exc.'},{b:'ba',t:'★★★★★'},{b:'ba',t:'✓'},{b:'bb',t:'✓'}],
-      [{v:'NS7621 Viptera3'},{b:'ba',t:'VT3P'},{m:1,h:1,v:'116'},{m:1,v:'820'},{m:1,v:'310g'},{v:'Cdo. Duro'},{v:'Media'},{b:'ba',t:'Alto'},{b:'ba',t:'Exc.'},{b:'ba',t:'★★★★★'},{b:'bb',t:'✓'},{b:'ba',t:'✓'}],
-      [{v:'NS7624 Viptera3CL'},{b:'bb',t:'VT3CL'},{m:1,h:1,v:'116'},{m:1,v:'815'},{m:1,v:'305g'},{v:'Cdo. Duro'},{v:'Media'},{b:'bb',t:'M.Bno'},{b:'ba',t:'M.Bno'},{b:'bb',t:'★★★★☆'},{b:'bb',t:'✓'},{b:'bb',t:'✓'}],
-      [{v:'NS7921 Viptera3CL'},{b:'bb',t:'VT3CL'},{m:1,h:1,v:'119'},{m:1,v:'850'},{m:1,v:'330g'},{v:'Cdo. Semi'},{v:'Alta'},{b:'ba',t:'Alto'},{b:'bb',t:'Bno'},{b:'ba',t:'★★★★★'},{b:'ba',t:'✓'},{b:'bb',t:'✓'}],
-      [{v:'AX7761VT3P'},{b:'ba',t:'VT3P'},{m:1,h:1,v:'117'},{m:1,v:'825'},{m:1,v:'315g'},{v:'Cdo. Duro'},{v:'Med-Alta'},{b:'bb',t:'M.Bno'},{b:'ba',t:'M.Bno'},{b:'bb',t:'★★★★☆'},{b:'bb',t:'✓'},{b:'bb',t:'✓'}],
-      [{v:'NS7818VIP3'},{b:'ba',t:'VIP3'},{m:1,h:1,v:'118'},{m:1,v:'835'},{m:1,v:'290g'},{v:'Cdo. Duro'},{v:'Media'},{b:'bb',t:'Bno'},{b:'ba',t:'Exc.'},{b:'bc',t:'★★★☆☆'},{b:'bb',t:'✓'},{b:'bb',t:'✓'}],
-      [{v:'NS7852 Viptera3'},{b:'ba',t:'VT3P'},{m:1,h:1,v:'118'},{m:1,v:'840'},{m:1,v:'335g'},{v:'Cdo. Semi'},{v:'Alta'},{b:'ba',t:'Alto'},{b:'bb',t:'Bno'},{b:'ba',t:'★★★★★'},{b:'ba',t:'✓'},{b:'ba',t:'✓'}],
-      [{v:'NS7925 Viptera3'},{b:'ba',t:'VT3P'},{m:1,h:1,v:'119'},{m:1,v:'855'},{m:1,v:'340g'},{v:'Cdo. Duro'},{v:'Alta'},{b:'ba',t:'Alto'},{b:'bb',t:'Bno'},{b:'ba',t:'★★★★★'},{b:'ba',t:'✓'},{b:'bb',t:'✓'}]
-    ]
-  },
-  girasol: {
-    cols: ['Híbrido','Tec.','MR','GDU','P.Mil','Tipo','% Aceite','Altura','Bremia','Jassid','Rinde','Estabil.'],
-    rows: [
-      [{v:'NS1113CL'},{b:'bb',t:'CL'},{m:1,h:1,v:'110'},{m:1,v:'1450'},{m:1,v:'65g'},{v:'A. Oleico'},{m:1,h:1,v:'47%'},{v:'Media'},{b:'ba',t:'R'},{b:'ba',t:'R'},{b:'ba',t:'★★★★★'},{b:'ba',t:'Alta'}],
-      [{v:'NS1227CLHO'},{b:'bb',t:'CL·HO'},{m:1,h:1,v:'112'},{m:1,v:'1480'},{m:1,v:'70g'},{v:'A. Oleico'},{m:1,h:1,v:'49%'},{v:'Med-Alta'},{b:'ba',t:'R'},{b:'ba',t:'R'},{b:'ba',t:'★★★★★'},{b:'ba',t:'Alta'}],
-      [{v:'NS1115CL'},{b:'bb',t:'CL'},{m:1,h:1,v:'111'},{m:1,v:'1460'},{m:1,v:'62g'},{v:'Linoleico'},{m:1,h:1,v:'44%'},{v:'Baja-Med'},{b:'ba',t:'R'},{b:'bb',t:'MR'},{b:'bb',t:'★★★★☆'},{b:'bb',t:'M.Alta'}],
-      [{v:'NS1117CL'},{b:'bb',t:'CL'},{m:1,h:1,v:'111'},{m:1,v:'1470'},{m:1,v:'68g'},{v:'Linoleico'},{m:1,h:1,v:'44%'},{v:'Media'},{b:'ba',t:'R'},{b:'ba',t:'R'},{b:'ba',t:'★★★★★'},{b:'ba',t:'Alta'}]
-    ]
-  }
-};
-
-/* ══════════════════════════════════════════════════════════════════
    STATE
    ══════════════════════════════════════════════════════════════════ */
 let CATALOGO = CATALOGO_DEFAULT;
@@ -520,24 +543,6 @@ function hybridType(name) {
 // Reusable toggle HTML generator
 function makeToggle(id, name, sub, onChange, checked=false) {
   return `<div class="toggle-box"><div><p class="tname">${name}</p>${sub?`<p class="tsub">${sub}</p>`:''}</div><div class="toggle-wrap"><input type="checkbox" id="${id}" ${checked?'checked':''} onchange="${onChange}" class="toggle-cb"><label for="${id}" class="toggle-lb"></label></div></div>`;
-}
-
-// Reusable tech table renderer
-function renderTechTable(data) {
-  let h='<table class="tech-table"><thead><tr>';
-  data.cols.forEach((c,i) => h+=`<th${i===0?' style="text-align:left;padding-right:8px"':''}>${c}</th>`);
-  h+='</tr></thead><tbody>';
-  data.rows.forEach(row => {
-    h+='<tr>';
-    row.forEach((cell,i) => {
-      if(i===0) h+=`<td style="padding-right:8px;min-width:${data===TECH_DATA.maiz?148:110}px">${cell.v}</td>`;
-      else if(cell.b) h+=`<td><span class="badge ${cell.b}">${cell.t}</span></td>`;
-      else if(cell.m) h+=`<td style="font-family:var(--mono);${cell.h?'font-weight:700;color:var(--c-navy)':''}">${cell.v}</td>`;
-      else h+=`<td>${cell.v}</td>`;
-    });
-    h+='</tr>';
-  });
-  return h+'</tbody></table>';
 }
 
 // Shared html2canvas capture helper — supports PNG share, PNG download, and PDF download
@@ -597,6 +602,7 @@ const App = {
       $('tab-'+t).className = 'tab-btn'+(t===id?' active':'');
     });
     if(id==='market') Market.render();
+    if(id==='tech') TechFicha.load();
     if(id==='cond') Conditions.load();
   },
   async loadCatalog() {
@@ -629,8 +635,7 @@ const App = {
       makeToggle('mktCross','Cross',null,'Market.render()')
     ].join('');
     // Render tech tables from data
-    $('techMaiz').innerHTML = renderTechTable(TECH_DATA.maiz);
-    $('techGirasol').innerHTML = renderTechTable(TECH_DATA.girasol);
+    // (now loaded dynamically via TechFicha module when tab is opened)
   },
   init() {
     const saved = localStorage.getItem('hs_vendor');
@@ -904,6 +909,148 @@ const Quote = {
       await captureAndShare($('quote-content'), `Cotizacion_${$('cliente').value||'Cliente'}.pdf`, {pdf:true, width:420});
     } catch(e) { alert('Error al generar PDF'); }
     finally { btn.innerHTML=orig; btn.disabled=false; }
+  }
+};
+
+/* ══════════════════════════════════════════════════════════════════
+   TECH FICHA — fichas técnicas dinámicas desde Sheets
+   ══════════════════════════════════════════════════════════════════ */
+const TechFicha = {
+  _cache: null,
+  _loaded: false,
+
+  async load() {
+    if(this._loaded){ return; }
+    if(!CONFIG.APPS_SCRIPT_URL){ $('techCards').innerHTML='<p style="color:var(--c-light);font-size:.75rem;">Sin conexión a Sheets</p>'; return; }
+    $('techCards').innerHTML='<p style="color:var(--c-light);font-size:.75rem;">⏳ Cargando datos técnicos...</p>';
+    try {
+      const r=await fetch(CONFIG.APPS_SCRIPT_URL+'?action=getDatosTecnicos',{redirect:'follow'});
+      const d=await r.json();
+      if(d.error) throw new Error(d.error);
+      this._cache=d;
+      this._loaded=true;
+      this.render();
+    } catch(e) {
+      $('techCards').innerHTML='<p style="color:#e74c3c;font-size:.75rem;">Error: '+e.message+'</p>';
+    }
+  },
+
+  filter(tipo, btn) {
+    document.querySelectorAll('.tech-pill').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.tcard').forEach(c=>{
+      c.style.display=(tipo==='all'||c.dataset.tipo===tipo)?'block':'none';
+    });
+  },
+
+  toggle(card, e) {
+    if(e.target.closest('a')||e.target.closest('.btn-marbete')) return;
+    card.classList.toggle('open');
+  },
+
+  getTecClass(bt) {
+    if(!bt) return 'tec-vt3p';
+    const b=bt.toLowerCase();
+    if(b.includes('cltg')||b.includes('refugio')) return 'tec-cltg';
+    if(b.includes('cl')) return 'tec-cl';
+    if(b.includes('vt3p')) return 'tec-vt3p';
+    if(b.includes('vip')) return 'tec-vip3';
+    if(b.includes('clearfield')) return 'tec-cl';
+    return 'tec-vt3p';
+  },
+
+  sanitBar(val) {
+    if(val===null||val===undefined||val==='') return '';
+    const s=String(val).trim().toUpperCase();
+    if(s==='R') return '<div class="sanit-bar s-res" style="width:100%"></div>';
+    if(s==='S/D') return '<div class="sanit-bar" style="width:10%;background:#cbd5e1"></div>';
+    const n=parseInt(s);
+    if(isNaN(n)) return '';
+    const pct=Math.max(10,100-(n-1)*11.1);
+    let cls='s-exc';
+    if(n>=7) cls='s-poor'; else if(n>=5) cls='s-fair'; else if(n>=4) cls='s-mod'; else if(n>=3) cls='s-good';
+    return `<div class="sanit-bar ${cls}" style="width:${pct}%"></div>`;
+  },
+
+  sanitLabel(val) {
+    if(val===null||val===undefined||val==='') return '—';
+    return String(val).trim().toUpperCase();
+  },
+
+  buildSanitario(h, tipo) {
+    const fields = tipo==='maiz' ? [
+      ['Tizón',h.m_tizon],['Roya',h.m_roya],['Green Snap',h.m_green_snap],
+      ['Quebrado',h.m_quebrado],['MRCV',h.m_mrcv],['Vuelco',h.m_vuelco],
+      ['Spiroplasma',h.m_spiroplasma]
+    ] : [
+      ['Verticilium',h.g_verticilium],['Sclerotinia',h.g_sclerotinia],
+      ['Roya negra',h.g_roya_negra],['Phomopsis',h.g_phomopsis],
+      ['Downy Mildew',h.g_downy_mildew]
+    ];
+    return fields.filter(f=>f[1]!==null&&f[1]!==undefined&&f[1]!=='').map(f=>
+      `<div class="sanit-row"><span class="sanit-name">${f[0]}</span><div class="sanit-bar-wrap">${this.sanitBar(f[1])}</div><span class="sanit-val">${this.sanitLabel(f[1])}</span></div>`
+    ).join('');
+  },
+
+  buildEnsayos(h, tipo) {
+    let rows=[];
+    if(tipo==='maiz') {
+      if(h.m_temp_exito) rows.push(['Temprana',h.m_temp_exito,h.m_temp_n,h.m_temp_dif]);
+      if(h.m_tard_templ_exito) rows.push(['Tardía templ.',h.m_tard_templ_exito,h.m_tard_templ_n,h.m_tard_templ_dif]);
+      if(h.m_tard_norte_exito) rows.push(['Tardía norte',h.m_tard_norte_exito,h.m_tard_norte_n,h.m_tard_norte_dif]);
+    } else {
+      if(h.g_sur_oeste_exito) rows.push(['Sur + Oeste',h.g_sur_oeste_exito,h.g_sur_oeste_n,h.g_sur_oeste_dif]);
+      if(h.g_norte_exito) rows.push(['Norte',h.g_norte_exito,h.g_norte_n,h.g_norte_dif]);
+    }
+    if(!rows.length) return '';
+    const unit=tipo==='maiz'?'kg/ha':'qq/ha';
+    const exitoCls=v=>{if(!v)return'e-mid';const n=parseInt(v);return n>=65?'e-hi':n>=50?'e-mid':'e-lo';};
+    const difCls=v=>{if(!v)return'd-dns';const s=String(v);if(s.includes('DNS'))return'd-dns';if(s.startsWith('+'))return'd-pos';if(s.startsWith('-'))return'd-neg';return'd-dns';};
+    return `<div style="margin-bottom:12px;"><p class="slabel" style="margin-bottom:8px;">Resultados de ensayo (${unit})</p>`+
+      rows.map(r=>`<div class="ensayo-row"><span class="ensayo-epoca">${r[0]}</span><span class="ensayo-exito ${exitoCls(r[1])}">${r[1]||'—'}</span><span class="ensayo-n">n=${r[2]||'?'}</span><span class="ensayo-dif ${difCls(r[3])}">${r[3]||'—'}</span></div>`).join('')+'</div>';
+  },
+
+  buildCard(h, idx) {
+    const tipo=String(h.tipo).toLowerCase();
+    const isG=tipo==='girasol';
+    const tecClass=this.getTecClass(h.biotecnologia);
+    const bt=h.biotecnologia||'—';
+
+    const stats=isG?
+      `<div class="tstats"><div class="tstat"><div class="tstat-val">${h.g_ciclo||'—'}</div><div class="tstat-label">Ciclo</div></div><div class="tstat"><div class="tstat-val">${h.g_aceite_grano||'—'}</div><div class="tstat-label">Aceite</div></div><div class="tstat"><div class="tstat-val">${h.g_tipo_aceite||'—'}</div><div class="tstat-label">Tipo</div></div><div class="tstat"><div class="tstat-val">${h.pms_g?h.pms_g+'g':'—'}</div><div class="tstat-label">PMS</div></div></div>`:
+      `<div class="tstats"><div class="tstat"><div class="tstat-val">${h.gdu||'—'}</div><div class="tstat-label">GDU</div></div><div class="tstat"><div class="tstat-val">${h.pms_g?h.pms_g+'g':'—'}</div><div class="tstat-label">PMS</div></div><div class="tstat"><div class="tstat-val">${h.altura_cm?h.altura_cm+'cm':'—'}</div><div class="tstat-label">Altura</div></div><div class="tstat"><div class="tstat-val">${h.tipo_grano||'—'}</div><div class="tstat-label">Grano</div></div></div>`;
+
+    const ambientes=['b','mb','ma','a'].map(k=>{
+      const on=h['ambiente_'+k]==='X';
+      return `<span class="tamb ${on?'on':'off'}">${k.toUpperCase()}</span>`;
+    }).join('');
+
+    const marbeteBtn=h.marbete_url?
+      `<a href="${h.marbete_url}" target="_blank" rel="noopener" class="btn-marbete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Descargar marbete PDF</a>`:
+      `<button class="btn-marbete disabled">Marbete PDF — próximamente</button>`;
+
+    return `<div class="tcard" data-tipo="${tipo}" style="animation-delay:${idx*0.04}s" onclick="TechFicha.toggle(this,event)">
+      <div class="tcard-header">
+        <div class="tcard-left"><p class="tcard-name">${h.id}</p><span class="tcard-tec ${tecClass}">${bt}</span></div>
+        <div class="tcard-mr"><div class="tcard-mr-val">${h.madurez_relativa||'—'}</div><div class="tcard-mr-label">MR</div></div>
+        <span class="tcard-arrow">▼</span>
+      </div>
+      <div class="tcard-body">
+        <p class="tdesc ${isG?'girasol-desc':''}">${h.descripcion||''}</p>
+        ${stats}
+        <div class="tambientes"><span style="font-size:.5rem;font-weight:600;color:var(--c-light);margin-right:4px;">AMB:</span>${ambientes}</div>
+        <div style="margin-bottom:12px;"><p class="slabel" style="margin-bottom:8px;">Perfil sanitario (1=excelente · 9=deficiente · R=resistente)</p>${this.buildSanitario(h,tipo)}</div>
+        ${this.buildEnsayos(h,tipo)}
+        ${marbeteBtn}
+      </div>
+    </div>`;
+  },
+
+  render() {
+    if(!this._cache) return;
+    const all=[...this._cache.maiz,...this._cache.girasol];
+    if(!all.length){ $('techCards').innerHTML='<p style="color:var(--c-light);font-size:.75rem;">Sin datos técnicos en Sheets</p>'; return; }
+    $('techCards').innerHTML=all.map((h,i)=>this.buildCard(h,i)).join('');
   }
 };
 

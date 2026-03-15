@@ -1,14 +1,15 @@
 const SPREADSHEET_ID = '1vFYnqndbN3ya3_aZMu4qozXMMlJtcqtrdtKLm-PK9Ew';
-
+ 
 function doGet(e) {
   var action = e.parameter.action;
   if (action === 'getCatalogo') return jsonResponse(getCatalogo());
   if (action === 'getNextNumber') return jsonResponse({ numero: getNextQuoteNumber() });
   if (action === 'getCondiciones') return jsonResponse(getCondiciones());
   if (action === 'getHistorial') return jsonResponse(getHistorial());
+  if (action === 'getDatosTecnicos') return jsonResponse(getDatosTecnicos());
   return jsonResponse({ error: 'Acción no reconocida' });
 }
-
+ 
 function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
@@ -21,13 +22,13 @@ function doPost(e) {
     return jsonResponse({ error: err.message });
   }
 }
-
+ 
 function jsonResponse(obj) {
   return ContentService
     .createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
 }
-
+ 
 function getCatalogo() {
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   var sheet = ss.getSheetByName('Catalogo');
@@ -43,7 +44,7 @@ function getCatalogo() {
   }
   return catalogo;
 }
-
+ 
 function getCondiciones() {
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   var sheet = ss.getSheetByName('Condiciones');
@@ -63,25 +64,20 @@ function getCondiciones() {
   }
   return result;
 }
-
-// Devuelve las últimas 100 filas de Cotizaciones (sin encabezado)
+ 
 function getHistorial() {
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   var sheet = ss.getSheetByName('Cotizaciones');
   var lastRow = sheet.getLastRow();
   if (lastRow <= 1) return [];
-  
-  // Traer últimas 100 filas como máximo
   var startRow = Math.max(2, lastRow - 99);
   var numRows = lastRow - startRow + 1;
-  var numCols = 19; // N° hasta Total c/IVA
-  
+  var numCols = 19;
   var range = sheet.getRange(startRow, 1, numRows, numCols);
   var values = range.getValues();
-  
   return values;
 }
-
+ 
 function getNextQuoteNumber() {
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   var sheet = ss.getSheetByName('Cotizaciones');
@@ -90,17 +86,15 @@ function getNextQuoteNumber() {
   var lastNumber = sheet.getRange(lastRow, 1).getValue();
   return (Number(lastNumber) || 0) + 1;
 }
-
-// UNA FILA POR ÍTEM
-// N° | Fecha | Vendedor | Cliente | CUIT | Híbrido | Banda | Cant | Precio Neto | Band% | Pre-Camp% | Contado% | Crecer% | Cross% | Vol% | Zonal% | Hend% | Total s/IVA | Total c/IVA
+ 
 function registrarCotizacion(data) {
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   var sheet = ss.getSheetByName('Cotizaciones');
   var numero = getNextQuoteNumber();
   var fecha = Utilities.formatDate(new Date(), 'America/Argentina/Buenos_Aires', 'dd/MM/yyyy HH:mm');
-
+ 
   var items = data.items || [];
-
+ 
   for (var i = 0; i < items.length; i++) {
     var item = items[i];
     sheet.appendRow([
@@ -125,6 +119,44 @@ function registrarCotizacion(data) {
       item.totalCIVA || 0
     ]);
   }
-
+ 
   return numero;
+}
+ 
+// ══════════════════════════════════════════════════════════════
+// DATOS TÉCNICOS — Lee la hoja "DatosTecnicos" y devuelve
+// un JSON separado por tipo {maiz: [...], girasol: [...]}
+// ══════════════════════════════════════════════════════════════
+function getDatosTecnicos() {
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var sheet = ss.getSheetByName('DatosTecnicos');
+  if (!sheet) return { error: 'Hoja DatosTecnicos no encontrada' };
+  
+  var data = sheet.getDataRange().getValues();
+  if (data.length < 2) return { maiz: [], girasol: [] };
+  
+  var headers = data[0];
+  var result = { maiz: [], girasol: [] };
+  
+  for (var i = 1; i < data.length; i++) {
+    var row = {};
+    for (var j = 0; j < headers.length; j++) {
+      var key = String(headers[j]).trim();
+      var val = data[i][j];
+      if (val === '' || val === null || val === undefined) {
+        row[key] = null;
+      } else {
+        row[key] = val;
+      }
+    }
+    
+    var tipo = String(row.tipo || '').trim().toLowerCase();
+    if (tipo === 'maiz' || tipo === 'maíz') {
+      result.maiz.push(row);
+    } else if (tipo === 'girasol') {
+      result.girasol.push(row);
+    }
+  }
+  
+  return result;
 }
